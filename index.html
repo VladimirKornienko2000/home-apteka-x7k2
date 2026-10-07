@@ -1,0 +1,783 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аптечка дома</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #f2f6f4;
+  --surface: #ffffff;
+  --surface-2: #e8efec;
+  --text: #13211c;
+  --dim: #566761;
+  --line: #d8e2de;
+  --accent: #1c7558;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcefe7;
+  --ok: #2c7a4b;
+  --warn: #8f5a08;
+  --warn-soft: #faedd3;
+  --bad: #ae3326;
+  --bad-soft: #f9dfdb;
+  --z1: #c8482f;
+  --z2: #2b6cb0;
+  --z3: #96640c;
+  --z4: #7250b0;
+  --on-z: #ffffff;
+  --shadow: 0 1px 2px rgba(19, 33, 28, 0.06);
+  --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1a16;
+    --surface: #17241f;
+    --surface-2: #1f2f29;
+    --text: #e6f0ec;
+    --dim: #93a8a0;
+    --line: #2b3d36;
+    --accent: #4cc39a;
+    --accent-ink: #08221a;
+    --accent-soft: #1d3b31;
+    --ok: #62c98d;
+    --warn: #e8b25a;
+    --warn-soft: #3a2c12;
+    --bad: #f0806f;
+    --bad-soft: #40201b;
+    --z1: #ee7d66;
+    --z2: #6aa5e6;
+    --z3: #dfa943;
+    --z4: #a98be0;
+    --on-z: #0f1a16;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1a16;
+  --surface: #17241f;
+  --surface-2: #1f2f29;
+  --text: #e6f0ec;
+  --dim: #93a8a0;
+  --line: #2b3d36;
+  --accent: #4cc39a;
+  --accent-ink: #08221a;
+  --accent-soft: #1d3b31;
+  --ok: #62c98d;
+  --warn: #e8b25a;
+  --warn-soft: #3a2c12;
+  --bad: #f0806f;
+  --bad-soft: #40201b;
+  --z1: #ee7d66;
+  --z2: #6aa5e6;
+  --z3: #dfa943;
+  --z4: #a98be0;
+  --on-z: #0f1a16;
+  --shadow: none;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.45;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.head {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  padding: 12px 16px 12px;
+}
+.head-in { max-width: 1040px; margin: 0 auto; display: grid; gap: 10px; }
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.count { color: var(--dim); font-size: 13px; font-variant-numeric: tabular-nums; }
+.btn {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 500;
+  min-height: 40px;
+}
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.danger { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, var(--line)); }
+.search-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.search {
+  position: relative;
+}
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--dim); }
+.search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px 10px 38px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 16px;
+}
+.seg { display: inline-grid; grid-auto-flow: column; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; border-radius: 7px; padding: 0 12px; min-height: 36px; color: var(--dim); font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+main { max-width: 1040px; margin: 0 auto; padding: 14px 16px 60px; display: grid; gap: 14px; }
+.notice {
+  font-size: 13px;
+  color: var(--dim);
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.filters { display: grid; gap: 10px; }
+.frow { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.frow::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 0 13px;
+  min-height: 36px;
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip .n { font-family: var(--mono); font-size: 12px; opacity: 0.85; }
+.chip.zc .zdot { width: 9px; height: 9px; border-radius: 2px; background: var(--zc); }
+.chip.zc[aria-pressed="true"] .zdot { background: var(--accent-ink); }
+.chip.flag[data-kind="bad"]:not([aria-pressed="true"]) { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
+.chip.flag[data-kind="warn"]:not([aria-pressed="true"]) { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); }
+.tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.tools label { color: var(--dim); font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+.tools select {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 10px; min-height: 36px;
+}
+
+.analogs {
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: var(--accent-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 10px;
+}
+.analogs h2 { margin: 0; font-size: 14px; font-weight: 600; }
+.agroup { display: grid; gap: 6px; }
+.agroup .k { font-size: 13px; font-weight: 600; }
+.achips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ach {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 5px 9px;
+  font-size: 13px;
+  text-align: left;
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.ach b { font-weight: 600; }
+.ach span { color: var(--dim); font-variant-numeric: tabular-nums; }
+
+.grid { display: grid; gap: 10px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  align-content: start;
+}
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.name { font-size: 16px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.qtext { font-size: 12px; color: var(--dim); margin-top: 2px; overflow-wrap: anywhere; }
+
+.stock { display: inline-flex; align-items: center; gap: 4px; flex: none; }
+.sb {
+  width: 38px; height: 38px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  border-radius: 8px;
+  font-size: 20px; line-height: 1;
+  display: grid; place-items: center;
+}
+.sb:disabled { opacity: 0.35; cursor: default; }
+.sv {
+  min-width: 64px; min-height: 38px;
+  border: 0; background: transparent;
+  font-family: var(--mono); font-weight: 600; font-size: 17px;
+  display: inline-flex; align-items: baseline; justify-content: center; gap: 4px;
+  padding: 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+.sv .unit, .stock .unit { font-family: var(--font); font-weight: 500; font-size: 12px; color: var(--dim); }
+.sin {
+  width: 84px; min-height: 38px; text-align: center;
+  border: 2px solid var(--accent); border-radius: 8px; background: var(--surface);
+  font-family: var(--mono); font-size: 17px; font-weight: 600;
+}
+
+.loc {
+  --zc: var(--dim);
+  display: flex; align-items: center; gap: 10px;
+  border-radius: 10px;
+  padding: 7px 10px 7px 7px;
+  background: color-mix(in srgb, var(--zc) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--zc) 30%, var(--line));
+}
+.loc.z1 { --zc: var(--z1); } .loc.z2 { --zc: var(--z2); } .loc.z3 { --zc: var(--z3); } .loc.z4 { --zc: var(--z4); }
+.loc .zn {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: var(--zc); color: var(--on-z);
+  font-family: var(--mono); font-weight: 600; font-size: 16px;
+  display: grid; place-items: center; flex: none;
+}
+.loc.z0 .zn { background: var(--surface-2); color: var(--dim); }
+.loc .lt { display: grid; line-height: 1.25; min-width: 0; }
+.loc .lt b { font-size: 14px; font-weight: 600; }
+.loc .lt small { color: var(--dim); font-size: 12.5px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--dim); overflow-wrap: anywhere; }
+.tag.sub { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.tag.exp.ok { background: var(--surface-2); color: var(--dim); }
+.tag.exp.soon, .tag.unclear { background: var(--warn-soft); color: var(--warn); font-weight: 500; }
+.tag.exp.expired, .tag.empty { background: var(--bad-soft); color: var(--bad); font-weight: 500; }
+.notes {
+  margin: 0; font-size: 13px; color: var(--dim);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  cursor: pointer;
+}
+.notes.open { -webkit-line-clamp: unset; display: block; }
+.acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.link {
+  border: 0; background: transparent; color: var(--accent); font-weight: 500; font-size: 14px;
+  min-height: 36px; padding: 0 10px 0 0;
+}
+.link.del { color: var(--bad); }
+.link.plain { color: var(--dim); }
+
+.sgroup { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; align-content: start; }
+.sgroup h3 { margin: 0; font-size: 16px; font-weight: 600; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.sgroup h3 span { font-size: 12.5px; color: var(--dim); font-weight: 500; }
+.srow { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding-top: 8px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.srow .sn { font-weight: 500; overflow-wrap: anywhere; }
+.srow .sm { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.zmini { font-family: var(--mono); font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 6px; background: var(--zc, var(--surface-2)); color: var(--on-z); }
+.zmini.z1 { --zc: var(--z1); } .zmini.z2 { --zc: var(--z2); } .zmini.z3 { --zc: var(--z3); } .zmini.z4 { --zc: var(--z4); }
+
+.empty { text-align: center; color: var(--dim); padding: 40px 16px; border: 1px dashed var(--line); border-radius: 12px; }
+.foot { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; color: var(--dim); font-size: 13px; padding-top: 6px; }
+
+.overlay[hidden] { display: none; }
+.overlay { position: fixed; inset: 0; background: rgba(6, 14, 11, 0.55); z-index: 50; display: flex; align-items: flex-end; justify-content: center; }
+.sheet {
+  background: var(--bg);
+  width: 100%; max-width: 620px;
+  border-radius: 16px 16px 0 0;
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  max-height: 92%; overflow-y: auto;
+  display: grid; gap: 12px;
+}
+@media (min-width: 700px) { .overlay { align-items: center; } .sheet { border-radius: 16px; } }
+.sheet h2 { margin: 0; font-size: 18px; }
+.f { display: grid; gap: 5px; }
+.f label { font-size: 13px; color: var(--dim); }
+.f input[type="text"], .f input[type="number"], .f select, .f textarea {
+  width: 100%; min-height: 42px; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 16px;
+}
+.f textarea { min-height: 64px; resize: vertical; }
+.r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.r3 { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
+.chk { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+.err { color: var(--bad); font-size: 13px; min-height: 18px; }
+.sheet-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+</style>
+</head><body>
+
+<header class="head">
+  <div class="head-in">
+    <div class="title-row">
+      <div>
+        <h1>Аптечка дома</h1>
+        <div class="count" id="count"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="syncBtn" type="button" title="Синхронизация между устройствами">☁ …</button>
+        <button class="btn primary" id="addBtn" type="button">Добавить</button>
+      </div>
+    </div>
+    <div id="syncPanel" hidden style="margin:8px 0;padding:10px;border:1px solid var(--line,#8884);border-radius:10px;font-size:13px">
+      <div id="syncMsg" style="margin-bottom:8px"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input id="syncTok" type="password" placeholder="GitHub-токен (один раз на устройстве)" autocomplete="off" style="flex:1;min-width:200px;padding:8px;border-radius:8px;border:1px solid #8886;background:transparent;color:inherit">
+        <button class="btn" id="syncSaveTok" type="button">Сохранить токен</button>
+        <button class="btn" id="syncNow" type="button">Синхронизировать</button>
+      </div>
+    </div>
+    <div class="search-row">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Название или действующее вещество" autocomplete="off" aria-label="Поиск">
+      </div>
+      <div class="seg" role="group" aria-label="Вид">
+        <button type="button" data-act="view" data-v="list" aria-pressed="true">Препараты</button>
+        <button type="button" data-act="view" data-v="subs" aria-pressed="false">Вещества</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="notice">Предпросмотр. Данные из общей базы на 25.09.2026. Правки в этой версии сохраняются только в этом браузере.</div>
+  <section class="filters" id="filters"></section>
+  <div id="content"></div>
+  <div class="foot" id="foot"></div>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">Добавить лекарство</h2>
+    <div class="f"><label for="f_name">Название</label><input id="f_name" type="text" autocomplete="off"></div>
+    <div class="f"><label for="f_sub">Действующее вещество (несколько через +)</label><input id="f_sub" type="text" autocomplete="off"></div>
+    <div class="r2">
+      <div class="f"><label for="f_cat">Категория</label><select id="f_cat"></select></div>
+      <div class="f"><label for="f_zone">Где хранится</label><select id="f_zone"></select></div>
+    </div>
+    <div class="r3">
+      <div class="f"><label for="f_stock">Остаток (число)</label><input id="f_stock" type="number" inputmode="decimal" step="any" min="0"></div>
+      <div class="f"><label for="f_unit">Единица</label><select id="f_unit"></select></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="f_approx"> Остаток приблизительный</label>
+    <div class="r2">
+      <div class="f"><label for="f_form">Форма</label><select id="f_form"></select></div>
+      <div class="f"><label for="f_exp">Срок годности</label><input id="f_exp" type="text" placeholder="до 09.2027" autocomplete="off"></div>
+    </div>
+    <div class="f"><label for="f_qty">Количество, как записано</label><input id="f_qty" type="text" autocomplete="off"></div>
+    <div class="f"><label for="f_notes">Заметки</label><textarea id="f_notes"></textarea></div>
+    <label class="chk"><input type="checkbox" id="f_unclear"> Название или данные под вопросом</label>
+    <div class="err" id="f_err" role="alert"></div>
+    <div class="sheet-acts">
+      <button class="btn" id="cancelBtn" type="button">Отмена</button>
+      <button class="btn primary" id="saveBtn" type="button">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var SEED = [{"id": "m001", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Ибупрофен Хемофарм 400 мг", "notes": "", "quantity": "400 мг, 10 шт", "stock": 10, "stockApprox": false, "substance": "Ибупрофен", "unclear": false, "unit": "шт"}, {"id": "m002", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Ибупрофен 100 мг", "notes": "", "quantity": "100 мг", "stockApprox": false, "substance": "Ибупрофен", "unclear": false, "unit": "шт"}, {"id": "m003", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Парацетамол УБФ 500 мг", "notes": "", "quantity": "500 мг, 19 шт", "stock": 19, "stockApprox": false, "substance": "Парацетамол", "unclear": false, "unit": "шт"}, {"id": "m004", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Цитрамон П", "notes": "объединено: 2 упоминания одного препарата в описи", "quantity": "180 мг, 10 шт (ф9) + 3 шт (ф7) = 13 шт", "stock": 13, "stockApprox": false, "substance": "Ацетилсалициловая кислота+парацетамол+кофеин", "unclear": false, "unit": "шт"}, {"id": "m006", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Цитрамон Реневал", "notes": "", "quantity": "2 шт", "stock": 2, "stockApprox": false, "substance": "Ацетилсалициловая кислота+парацетамол+кофеин", "unclear": false, "unit": "шт"}, {"id": "m007", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Темпалгин 200 мг", "notes": "количество исправлено пользователем 26.09.2026: 40 шт (было ошибочно 28)", "quantity": "200 мг, 40 шт", "stock": 40, "stockApprox": false, "substance": "Метамизол натрия+триацетонамин", "unclear": false, "unit": "шт"}, {"id": "m008", "category": "Обезболивающие/жаропонижающие", "expiry": "до 06.2029", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Ибуклин", "notes": "возможно 2 разные упаковки", "quantity": "8+9 шт", "stock": 17, "stockApprox": false, "substance": "Ибупрофен+парацетамол", "unclear": false, "unit": "шт"}, {"id": "m009", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Но-шпа 40 мг", "notes": "объединено: повторные упоминания одного препарата (3 пачки), подтверждено", "quantity": "22 + 22 + 20 шт (3 пачки, всего 64); 40 мг (ф5)", "stock": 64, "stockApprox": false, "substance": "Дротаверин", "unclear": false, "unit": "шт"}, {"id": "m010", "category": "ЖКТ", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Максилак", "notes": "", "quantity": "1 таблетка", "stock": 1, "stockApprox": false, "substance": "Пробиотик (Максилак)", "unclear": false, "unit": "шт"}, {"id": "m011", "category": "ЖКТ", "expiry": "", "form": "капсула", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Дюспаталин 200 мг", "notes": "", "quantity": "200 мг, 6 шт", "stock": 6, "stockApprox": false, "substance": "Мебеверин", "unclear": false, "unit": "шт"}, {"id": "m012", "category": "ЖКТ", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Панкреатин 30 ЕД", "notes": "другая дозировка (25 ЕД) вынесена отдельно — m012b", "quantity": "30 ЕД, 60 табл", "stock": 60, "stockApprox": false, "substance": "Панкреатин", "unclear": false, "unit": "шт"}, {"id": "m012b", "category": "ЖКТ", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Панкреатин 25 ЕД", "notes": "отдельная дозировка", "quantity": "25 ЕД, 9 шт", "stock": 9, "stockApprox": false, "substance": "Панкреатин", "unclear": false, "unit": "шт"}, {"id": "m013", "category": "ЖКТ", "expiry": "", "form": "порошок", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Смекта (ванильная) 3 г", "notes": "дозировка 3 г/пакетик — стандартная для Смекты (точная дозировка не была названа при описи, взята из общих данных о препарате)", "quantity": "ванильная, 7 пакетиков", "stock": 7, "stockApprox": false, "substance": "Диосмектит", "unclear": false, "unit": "пак"}, {"id": "m014", "category": "ЖКТ", "expiry": "до 06.2028", "form": "гель", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Фосфалюгель 16 г", "notes": "названо «альминия фосфат гель»; вещество исправлено (ранее ошибочно алгелдрат+магния гидроксид)", "quantity": "16 г, 2 пакетика", "stock": 2, "stockApprox": false, "substance": "Алюминия фосфат", "unclear": false, "unit": "пак"}, {"id": "m015", "category": "ЖКТ", "expiry": "до 09.2026", "form": "гель", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Энтеросгель (паста) 22,5 г", "notes": "срок истекает в этом месяце (09.2026)", "quantity": "22.5 г", "stock": 22.5, "stockApprox": false, "substance": "Полиметилсилоксана полигидрат", "unclear": false, "unit": "г"}, {"id": "m017", "category": "ЖКТ", "expiry": "", "form": "капсула", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Урсофальк 250 мг", "notes": "", "quantity": "250 мг, 28 капсул", "stock": 28, "stockApprox": false, "substance": "Урсодезоксихолевая кислота", "unclear": false, "unit": "шт"}, {"id": "m018", "category": "ЖКТ", "expiry": "", "form": "капсула", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Линекс Форте", "notes": "", "quantity": "осталось 2 капсулы", "stock": 2, "stockApprox": false, "substance": "Пробиотик", "unclear": false, "unit": "шт"}, {"id": "m019", "category": "ЖКТ", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Нольпаза 20 мг", "notes": "", "quantity": "20 мг, 14 шт", "stock": 14, "stockApprox": false, "substance": "Пантопразол", "unclear": false, "unit": "шт"}, {"id": "m020", "category": "Неврология/мышцы", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Мидокалм (Толперизон) 150 мг", "notes": "Подтверждено: одно и то же лекарство, второе название — подзаголовок с упаковки (толперизон — действующее вещество Мидокалма).", "quantity": "150 мг, 20 шт", "stock": 20, "stockApprox": false, "substance": "Толперизон", "unclear": false, "unit": "шт"}, {"id": "m021", "category": "Неврология/мышцы", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Мебикар 500 мг", "notes": "Мебикар — действующее вещество, Адаптол — одно из торговых названий; проверено 25.09.2026", "quantity": "500 мг: 4+20 шт", "stock": 24, "stockApprox": false, "substance": "Мебикар", "unclear": false, "unit": "шт"}, {"id": "m022", "category": "Неврология/мышцы", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Диакарб 250 мг", "notes": "объединены повторные упоминания одной дозировки; 200 мг вынесено отдельно — m022b", "quantity": "250 мг: 2 шт (ф13) + 8 шт (ф5) + 30 шт (ф11) = 40 шт", "stock": 40, "stockApprox": false, "substance": "Ацетазоламид", "unclear": false, "unit": "шт"}, {"id": "m022b", "category": "Неврология/мышцы", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Диакарб 200 мг", "notes": "отдельная дозировка", "quantity": "200 мг: 5 шт (ф11)", "stock": 5, "stockApprox": false, "substance": "Ацетазоламид", "unclear": false, "unit": "шт"}, {"id": "m023", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "капсула", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Умифеновир (Арбидол) 100 мг", "notes": "", "quantity": "100 мг, 20 капсул", "stock": 20, "stockApprox": false, "substance": "Умифеновир", "unclear": false, "unit": "шт"}, {"id": "m024", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "капсула", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Осельтамивир (Акрихин) 75 мг", "notes": "возможно 2 упаковки", "quantity": "75 мг, 5 капсул (ф9) + 4 капсулы (ф4)", "stock": 9, "stockApprox": false, "substance": "Осельтамивир", "unclear": false, "unit": "шт"}, {"id": "m025", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "таблетка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Анаферон", "notes": "", "quantity": "15 шт", "stock": 15, "stockApprox": false, "substance": "Антитела к интерферону гамма", "unclear": false, "unit": "шт"}, {"id": "m026", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "таблетка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Амиксин", "notes": "", "quantity": "2 шт", "stock": 2, "stockApprox": false, "substance": "Тилорон", "unclear": false, "unit": "шт"}, {"id": "m027", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "порошок", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "АнвиМакс", "notes": "состав проверен через интернет 25.09.2026", "quantity": "порошок, 7 пакетиков", "stock": 7, "stockApprox": false, "substance": "Парацетамол+Аскорбиновая кислота+Кальция глюконат+Римантадин+Рутозид+Лоратадин", "unclear": false, "unit": "пак"}, {"id": "m028", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "таблетка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Синупрет", "notes": "состав проверен через интернет 25.09.2026", "quantity": "50 таблеток", "stock": 50, "stockApprox": false, "substance": "Горечавка+первоцвет+щавель+бузина+вербена (растительный)", "unclear": false, "unit": "шт"}, {"id": "m029", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "сироп", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Джосет 200 мл", "notes": "упаковка №1, срок не назван; состав сверен через интернет 25.09.2026 — бромгексин подтверждён (не амброксол), также в составе левоментол", "quantity": "200 мл, осталось половина (ф3)", "stock": 100, "stockApprox": false, "substance": "Сальбутамол+бромгексин+гвайфенезин", "unclear": false, "unit": "мл"}, {"id": "m029b", "category": "Простуда/ОРВИ/горло", "expiry": "до 09.2027", "form": "сироп", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Джосет 100 мл", "notes": "упаковка №2 («ещё один Джосет»); состав сверен через интернет 25.09.2026 — бромгексин подтверждён (не амброксол), также в составе левоментол", "quantity": "100 мл, осталось половина (ф6)", "stock": 50, "stockApprox": false, "substance": "Сальбутамол+бромгексин+гвайфенезин", "unclear": false, "unit": "мл"}, {"id": "m030", "category": "Простуда/ОРВИ/горло", "expiry": "до 02.2028", "form": "сироп", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Левопронт 120 мл", "notes": "Подтверждено пользователем: это разные упаковки Левопронта, не дубль записи.", "quantity": "120 мл — упоминается 3 раза с остатками 100/80/90 мл", "stock": 270, "stockApprox": false, "substance": "Леводропропизин", "unclear": false, "unit": "мл"}, {"id": "m031", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "спрей", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Стрепсилс Экспресс 20 мл", "notes": "ИСПРАВЛЕНО 25.09.2026: ранее ошибочно указан флурбипрофен (это состав Стрепсилс Интенсив)", "quantity": "20 мл, новый", "stock": 20, "stockApprox": false, "substance": "Лидокаин+Дихлорбензиловый спирт+Амилметакрезол", "unclear": false, "unit": "мл"}, {"id": "m032", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "пастилка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Стрепсилс Интенсив 8.75 мг", "notes": "дозировка 8.75 мг флурбипрофена/таблетка — стандартная (точная дозировка не была названа при описи, взята из общих данных о препарате)", "quantity": "5 таблеток для рассасывания", "stock": 5, "stockApprox": false, "substance": "Флурбипрофен", "unclear": false, "unit": "шт"}, {"id": "m033", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "пастилка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Граммидин", "notes": "возможно ещё «Граммидин с анестетиком» отдельно", "quantity": "3 шт (ф5) + 8 шт (ф11)", "stock": 11, "stockApprox": false, "substance": "Грамицидин С", "unclear": false, "unit": "шт"}, {"id": "m034", "category": "Простуда/ОРВИ/горло", "expiry": "до 06.2028", "form": "спрей", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Полидекса с фенилэфрином 15 мл", "notes": "срок годности исправлен на 2028 (при устной описи было названо «2008», это явная оговорка)", "quantity": "спрей назальный, 15 мл, осталось половина", "stock": 7.5, "stockApprox": false, "substance": "Неомицин+полимиксин В+фенилэфрин", "unclear": false, "unit": "мл"}, {"id": "m035", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "капли", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Називин 10 мл", "notes": "форма (капли/спрей) не уточнена при описи — если это спрей, поправьте", "quantity": "10 мл, новый", "stock": 10, "stockApprox": false, "substance": "Оксиметазолин", "unclear": false, "unit": "мл"}, {"id": "m036", "category": "Обезболивающие/жаропонижающее", "expiry": "", "form": "капсула", "location": "Зона 2 «Обезболивающие/жаропонижающее/ЖКТ» — справа сверху, верхний ящик", "name": "Нурофен Экспресс", "notes": "перенесено из категории Простуда/ОРВИ в Обезболивающие/жаропонижающее и в Зону 1, 26.09.2026 (Нурофен = ибупрофен)", "quantity": "1 капсула/флакон", "stock": 1, "stockApprox": false, "substance": "Ибупрофен", "unclear": false, "unit": "шт"}, {"id": "m037", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "капли", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Вертигохель 30 мл", "notes": "состав проверен через интернет 25.09.2026", "quantity": "30 мл, новый", "stock": 30, "stockApprox": false, "substance": "Cocculus+Ambra grisea+Petroleum rectificatum+Conium (гомеопатический)", "unclear": false, "unit": "мл"}, {"id": "m038", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "сироп", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Сироп от кашля (неопознан) 100 мл", "notes": "Пользователь пометил: разобраться с названием позже.", "quantity": "100 мл, новый", "stock": 100, "stockApprox": false, "substance": "", "unclear": true, "unit": "мл"}, {"id": "m039", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "пастилка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Леденцы с шалфеем, солодкой, ментолом и вит.С", "notes": "", "quantity": "4 шт", "stock": 4, "stockApprox": false, "substance": "", "unclear": false, "unit": "шт"}, {"id": "m040", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "порошок", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Порошок лимонной кислоты 10 г", "notes": "для полоскания горла", "quantity": "10 г, 3 шт", "stock": 3, "stockApprox": false, "substance": "Лимонная кислота", "unclear": false, "unit": "пак"}, {"id": "m041", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "пастилка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Граммидин с анестетиком", "notes": "состав проверен через интернет 25.09.2026; возможно те же 3 табл., что в m033 — проверить по упаковке", "quantity": "3 рассасывающих таблетки", "stock": 3, "stockApprox": false, "substance": "Грамицидин С+Оксибупрокаин+Цетилпиридиния хлорид", "unclear": false, "unit": "шт"}, {"id": "m042", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "таблетка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Синукомб", "notes": "ПРЕПАРАТ СУЩЕСТВУЕТ (БАД «Синукомб») — проверено через интернет 25.09.2026; точное количество в упаковке пока не удалось разобрать, уточнить по факту", "quantity": "уточнить кол-во", "stockApprox": false, "substance": "Рутин+растительные экстракты (первоцвет, бузина, щавель, вербена, горечавка)", "unclear": true, "unit": "шт"}, {"id": "m043", "category": "Сосуды", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Детралекс 1000 мг", "notes": "разные упаковки — подтверждено; количество исправлено пользователем 26.09.2026: всего 19.5 табл (было ошибочно 43.5)", "quantity": "19.5 табл (уточнено пользователем)", "stock": 19.5, "stockApprox": false, "substance": "Диосмин+гесперидин", "unclear": false, "unit": "шт"}, {"id": "m043b", "category": "Сосуды", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Детралекс 500 мг", "notes": "Подтверждено пользователем — это Детралекс, отдельная упаковка от 1000 мг.", "quantity": "500 мг, 28 шт", "stock": 28, "stockApprox": false, "substance": "Диосмин+гесперидин", "unclear": false, "unit": "шт"}, {"id": "m044", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона2-справа-верх", "name": "Мигралгин Грин", "notes": "ИСПРАВЛЕНО 25.09.2026: правильное название «Мигралгин Грин»; по составу — аналог Цитрамона (мелисса/мята — только вкус); категория изменена с простуды на обезболивающие", "quantity": "20 шт", "stock": 20, "stockApprox": false, "substance": "Ацетилсалициловая кислота+Парацетамол+Кофеин", "unclear": false, "unit": "шт"}, {"id": "m045", "category": "Витамины/БАДы", "expiry": "", "form": "таблетка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Витамин C шипучий 900 мг", "notes": "2 разные банки", "quantity": "900 мг: 12 шт (ф5), 19 шт (ф14)", "stock": 31, "stockApprox": false, "substance": "Аскорбиновая кислота", "unclear": false, "unit": "шт"}, {"id": "m046", "category": "Витамины/БАДы", "expiry": "", "form": "драже", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Аскорбиновая кислота (драже) 50 мг", "notes": "новая; дозировка 50 мг/драже — стандартная для аскорбиновой кислоты в драже (при описи названа только общая масса 50 г)", "quantity": "200 шт, 50 г, новая", "stock": 200, "stockApprox": false, "substance": "Аскорбиновая кислота", "unclear": false, "unit": "шт"}, {"id": "m047", "category": "Витамины/БАДы", "expiry": "", "form": "таблетка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Витамин D3 (производитель не указан)", "notes": "", "quantity": "120 таблеток, осталось ~80", "stock": 80, "stockApprox": false, "substance": "Холекальциферол", "unclear": false, "unit": "шт"}, {"id": "m048", "category": "Витамины/БАДы", "expiry": "до 09.2028", "form": "капли", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "D3 Max Актив 500 МЕ/капля, 30 мл", "notes": "", "quantity": "500 МЕ/капля, флакон 30 мл", "stock": 30, "stockApprox": false, "substance": "Холекальциферол", "unclear": false, "unit": "мл"}, {"id": "m049", "category": "Витамины/БАДы", "expiry": "", "form": "таблетка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Йодомарин 200 мкг", "notes": "", "quantity": "0.2 мг, осталось 60 из 100", "stock": 60, "stockApprox": false, "substance": "Калия йодид", "unclear": false, "unit": "шт"}, {"id": "m050", "category": "Гормоны/эндокринология", "expiry": "", "form": "таблетка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Эутирокс 25 мкг", "notes": "", "quantity": "25 мкг, 34 таблетки", "stock": 34, "stockApprox": false, "substance": "Левотироксин натрия", "unclear": false, "unit": "шт"}, {"id": "m051", "category": "Витамины/БАДы", "expiry": "", "form": "таблетка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Магния цитрат (Solgar)", "notes": "", "quantity": "осталось ~110 таблеток", "stock": 110, "stockApprox": false, "substance": "Магния цитрат", "unclear": false, "unit": "шт"}, {"id": "m052", "category": "Витамины/БАДы", "expiry": "", "form": "таблетка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Селен (Vitta Inert)", "notes": "", "quantity": "осталось 11 таблеток", "stock": 11, "stockApprox": false, "substance": "Селен", "unclear": false, "unit": "шт"}, {"id": "m053", "category": "Витамины/БАДы", "expiry": "", "form": "таблетка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Рафамин", "notes": "противовирусный препарат (не БАД); состав проверен через интернет 25.09.2026", "quantity": "49 таблеток", "stock": 49, "stockApprox": false, "substance": "Афинно очищенные антитела к интерферону гамма, CD4, β2-микроглобулину и β1-домену МНС", "unclear": false, "unit": "шт"}, {"id": "m054", "category": "Витамины/БАДы", "expiry": "до 09.2027", "form": "пастилка", "location": "Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик", "name": "Формула сна", "notes": "", "quantity": "осталось 40 из 45", "stock": 40, "stockApprox": false, "substance": "Мелатонин (предположительно)", "unclear": false, "unit": "шт"}, {"id": "m055", "category": "Наружное/антисептики", "expiry": "", "form": "мазь", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Хондрофен 30 г", "notes": "проверено через интернет 25.09.2026: в составе также диклофенак (НПВС), не только хондроитин и димексид — учитывайте вместе с другими НПВС", "quantity": "30 г, осталось ~10 г", "stock": 10, "stockApprox": false, "substance": "Хондроитина сульфат+Диклофенак+Диметилсульфоксид", "unclear": false, "unit": "г"}, {"id": "m056", "category": "Наружное/антисептики", "expiry": "", "form": "гель", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Диклофенак гель 5%, 100 г", "notes": "", "quantity": "5%, 100 г, осталось ~20 г", "stock": 20, "stockApprox": false, "substance": "Диклофенак", "unclear": false, "unit": "г"}, {"id": "m057", "category": "Наружное/антисептики", "expiry": "", "form": "аэрозоль", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Пантенол 5%, 130 г", "notes": "", "quantity": "5%, 130 г, осталось ~100 г", "stock": 100, "stockApprox": false, "substance": "Декспантенол", "unclear": false, "unit": "г"}, {"id": "m058", "category": "Наружное/антисептики", "expiry": "до 06.2028", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Мирамистин 50 мл", "notes": "", "quantity": "50 мл, осталось половина", "stock": 25, "stockApprox": false, "substance": "Бензилдиметил-миристоиламино-пропиламмоний", "unclear": false, "unit": "мл"}, {"id": "m059", "category": "Наружное/антисептики", "expiry": "до 11.2026", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Хлоргексидина биглюконат 0.05%, 100 мл", "notes": "", "quantity": "0.05%, 100 мл, полная", "stock": 100, "stockApprox": false, "substance": "Хлоргексидин", "unclear": false, "unit": "мл"}, {"id": "m060", "category": "Наружное/антисептики", "expiry": "", "form": "капли", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Оптинол 10 мл", "notes": "у Оптинола есть несколько версий с разным составом — уточнить по флакону, какая именно", "quantity": "10 мл, полная", "stock": 10, "stockApprox": false, "substance": "Гиалуронат натрия (предположительно)", "unclear": false, "unit": "мл"}, {"id": "m061", "category": "Наружное/антисептики", "expiry": "", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Меновазин 50 мл", "notes": "Меновазин Эко Лаб вынесен отдельно — m061b", "quantity": "50 мл, осталось половина (ф1)", "stock": 25, "stockApprox": false, "substance": "Ментол+прокаин+бензокаин", "unclear": false, "unit": "мл"}, {"id": "m061b", "category": "Наружное/антисептики", "expiry": "", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Меновазин Эко Лаб 50 мл", "notes": "другая марка", "quantity": "50 мл, осталось 40 (ф13)", "stock": 40, "stockApprox": false, "substance": "Ментол+прокаин+бензокаин", "unclear": false, "unit": "мл"}, {"id": "m062", "category": "Наружное/антисептики", "expiry": "до 04.2028", "form": "капли", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Флоксал 5 мл", "notes": "название и форма подтверждены пользователем 26.09.2026: Флоксал, капли (не спрей), ост. 4 мл", "quantity": "5 мл, осталось 4 мл", "stock": 4, "stockApprox": false, "substance": "Офлоксацин", "unclear": false, "unit": "мл"}, {"id": "m063", "category": "Наружное/антисептики", "expiry": "", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Йод спиртовой 5%, 25 мл", "notes": "", "quantity": "5%, 25 мл, осталось 15-20 мл", "stock": 17.5, "stockApprox": false, "substance": "Йод", "unclear": false, "unit": "мл"}, {"id": "m064", "category": "Наружное/антисептики", "expiry": "", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Салициловая кислота 1%, 40 мл", "notes": "", "quantity": "1%, 40 мл, осталось 30 мл", "stock": 30, "stockApprox": false, "substance": "Салициловая кислота", "unclear": false, "unit": "мл"}, {"id": "m065", "category": "Наружное/антисептики", "expiry": "до 03.2026", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Фукорцин бесцветный 20 мл", "notes": "состав проверен через интернет 25.09.2026", "quantity": "20 мл, осталось половина", "stock": 10, "stockApprox": false, "substance": "Фуксин+Борная кислота+Фенол+Резорцин", "unclear": false, "unit": "мл"}, {"id": "m066", "category": "Наружное/антисептики", "expiry": "", "form": "жидкость", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Масло чистотела 50 мл", "notes": "", "quantity": "50 мл, новая", "stock": 50, "stockApprox": false, "substance": "", "unclear": false, "unit": "мл"}, {"id": "m067", "category": "Наружное/антисептики", "expiry": "", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Клей БФ-6 10 г", "notes": "", "quantity": "10 г, спиртовой раствор", "stock": 10, "stockApprox": false, "substance": "", "unclear": false, "unit": "г"}, {"id": "m068", "category": "Наружное/антисептики", "expiry": "", "form": "раствор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Муравьиный спирт 1.4%, 50 мл", "notes": "ранее ошибочно указан остаток «40» (это была цифра от Меновазина); правильно — «новый», флакон полный", "quantity": "1.4%, 50 мл, новый (полный)", "stock": 50, "stockApprox": false, "substance": "Муравьиная кислота (спиртовой раствор)", "unclear": false, "unit": "мл"}, {"id": "m069", "category": "Наружное/антисептики", "expiry": "", "form": "гель", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Биодерма Сенсибио DS+ (гель-мусс) 200 мл", "notes": "состав проверен через интернет 25.09.2026 (линия DS+ для себорейного дерматита)", "quantity": "200 мл", "stock": 200, "stockApprox": false, "substance": "Пироктон оламин+Климбазол", "unclear": false, "unit": "мл"}, {"id": "m071", "category": "Прочее", "expiry": "", "form": "пластырь", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Унипласт (лейкопластырь)", "notes": "", "quantity": "4 шт", "stock": 4, "stockApprox": false, "substance": "", "unclear": false, "unit": "шт"}, {"id": "m072", "category": "Прочее", "expiry": "", "form": "прибор", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Градусник", "notes": "", "quantity": "1 шт", "stock": 1, "stockApprox": false, "substance": "", "unclear": false, "unit": "шт"}, {"id": "m073", "category": "Обезболивающие/жаропонижающие", "expiry": "", "form": "таблетка", "location": "Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик", "name": "Немисулид/Нимика 100 мг", "notes": "", "quantity": "100 мг, 20 табл", "stock": 20, "stockApprox": false, "substance": "Нимесулид", "unclear": false, "unit": "шт"}, {"id": "m074", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "таблетка", "location": "Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик", "name": "Таблетки от кашля Реневал", "notes": "ПОДТВЕРЖДЕНО 25.09.2026 — такой препарат существует (производитель «Обновление ПФК»)", "quantity": "3 пластины по 10, использована 1 табл (~29 шт)", "stock": 29, "stockApprox": false, "substance": "Термопсиса трава+Натрия гидрокарбонат", "unclear": false, "unit": "шт"}, {"id": "m075", "category": "Прочее", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Лоратавел 10 мг", "notes": "название уточнено по упаковке 26.09.2026: Лоратавел (лоратадин 10 мг)", "quantity": "10 мг, 3 табл", "stock": 3, "stockApprox": false, "substance": "Лоратадин", "unclear": false, "unit": "шт"}, {"id": "m077", "category": "Сосуды", "expiry": "", "form": "таблетка", "location": "Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик", "name": "Детравенол 1000 мг", "notes": "новая позиция; аналог Детралекса (диосмин+гесперидин); состав проверен через интернет 26.09.2026; количество исправлено пользователем 26.09.2026: 14 шт (было указано 10)", "quantity": "1000 мг, 14 шт", "stock": 14, "stockApprox": false, "substance": "Диосмин+гесперидин", "unclear": false, "unit": "шт"}, {"id": "m078", "category": "Витамины/БАДы", "expiry": "", "form": "капли", "location": "Зона 1 «Витамины/БАДы/гормоны» — слева сверху, верхний ящик", "name": "Детримакс Актив D3, 500 МЕ/капля, 30 мл", "notes": "новая позиция; название расшифровано как Детримакс Актив D3 (услышано «Б3»); состав проверен через интернет 26.09.2026; флакон новый, с дозатором", "quantity": "500 МЕ/капля, флакон 30 мл, новый", "stock": 30, "stockApprox": false, "substance": "Холекальциферол", "unclear": false, "unit": "мл"}, {"id": "m079", "category": "Обезболивающие/жаропонижающее", "expiry": "", "form": "таблетка", "location": "Зона 2 «Обезболивающие/жаропонижающее/ЖКТ» — справа сверху, верхний ящик", "name": "Спазмалгон", "notes": "новая позиция; состав проверен через интернет 26.09.2026", "quantity": "7 табл", "stock": 7, "stockApprox": false, "substance": "Метамизол натрия+питофенон+фенпивериния бромид", "unclear": false, "unit": "шт"}, {"id": "m080", "category": "ЖКТ", "expiry": "", "form": "порошок", "location": "Зона 2 «Обезболивающие/жаропонижающее/ЖКТ» — справа сверху, верхний ящик", "name": "Гидронорм (Витамир), порошок-саше 4.157 г", "notes": "новая позиция; БАД для регидратации (пр-во Квадрат-С/Витамир); наличие препарата проверено через интернет 26.09.2026", "quantity": "10 саше", "stock": 10, "stockApprox": false, "substance": "Электролиты (регидратационная смесь, БАД)", "unclear": false, "unit": "саше"}, {"id": "m081", "category": "Простуда/ОРВИ/горло", "expiry": "", "form": "сироп", "location": "Зона 3 «Простуда/ОРВИ/горло» — слева снизу, нижний ящик", "name": "Геделикс 100 мл", "notes": "новая позиция; состав проверен через интернет 26.09.2026", "quantity": "100 мл, новый", "stock": 100, "stockApprox": false, "substance": "Экстракт листьев плюща", "unclear": false, "unit": "мл"}];
+  var LS_KEY = 'apteka-preview-v2';
+  var ZONES = {
+    1: { n: 'Ежедневный приём', b: 'слева сверху', d: 'верхний ящик', loc: 'Зона 1 «Ежедневный приём» — слева сверху (22.5×23×16), верхний ящик' },
+    2: { n: 'Скорая помощь', b: 'справа сверху', d: 'верхний ящик', loc: 'Зона 2 «Скорая помощь» — справа сверху (21×27×16), верхний ящик' },
+    3: { n: 'Простуда и ОРВИ', b: 'слева снизу', d: 'нижний ящик', loc: 'Зона 3 «Простуда/ОРВИ» — слева снизу (24.5×23×16), нижний ящик' },
+    4: { n: 'Сосуды, неврология, наружное', b: 'справа снизу', d: 'нижний ящик', loc: 'Зона 4 «Сосуды/Неврология/Наружное/Прочее» — справа снизу (24×27×16), нижний ящик' }
+  };
+  var CATEGORIES = ['Обезболивающие/жаропонижающие', 'ЖКТ', 'Простуда/ОРВИ/горло', 'Сосуды', 'Неврология/мышцы', 'Витамины/БАДы', 'Гормоны/эндокринология', 'Наружное/антисептики', 'Прочее'];
+  var UNITS = ['шт', 'пак', 'мл', 'г'];
+  var FORMS = ['таблетка', 'капсула', 'драже', 'пастилка', 'порошок', 'сироп', 'капли', 'раствор', 'гель', 'мазь', 'аэрозоль', 'спрей', 'жидкость', 'пластырь', 'прибор'];
+  var GENERIC = ['гомеопатический', 'растительный', 'комплексный препарат', 'пробиотик'];
+
+  var items = load();
+  var st = { q: '', zone: 0, cat: '', flags: { unclear: false, expiry: false, empty: false }, sort: 'name', view: 'list', editingStock: null, delConfirm: null, editId: null, resetConfirm: false };
+
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+  function load() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw) { var a = JSON.parse(raw); if (Array.isArray(a) && a.length) return a; }
+    } catch (e) {}
+    return clone(SEED);
+  }
+  function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(items)); } catch (e) {} if (window.__syncReady) scheduleSync(); }
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmt(n) { var r = Math.round(n * 100) / 100; return String(r).replace('.', ','); }
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function stepOf(u) { return (u === 'мл' || u === 'г') ? 5 : 1; }
+  function zoneOf(it) { var m = /Зона\s*(\d)/.exec(it.location || ''); return m ? +m[1] : 0; }
+  function byId(id) { for (var i = 0; i < items.length; i++) if (items[i].id === id) return items[i]; return null; }
+
+  function expiryInfo(s) {
+    if (!s) return null;
+    var m = /(\d{1,2})\.(\d{4})/.exec(s);
+    if (!m) return { label: s, status: 'ok', end: null };
+    var end = new Date(+m[2], +m[1], 0, 23, 59, 59);
+    var days = Math.ceil((end - new Date()) / 86400000);
+    return { label: s, status: days < 0 ? 'expired' : days <= 90 ? 'soon' : 'ok', end: end.getTime() };
+  }
+  function comps(it) {
+    return (it.substance || '').toLowerCase().replace(/\(предп\.?\)/g, '').replace(/к-та/g, 'кислота').split('+')
+      .map(function (s) { return s.trim(); })
+      .filter(function (s) { return s && GENERIC.indexOf(s) < 0; });
+  }
+  function matchesQ(it) {
+    var q = st.q.trim().toLowerCase();
+    if (!q) return true;
+    return (it.name || '').toLowerCase().indexOf(q) >= 0 || (it.substance || '').toLowerCase().indexOf(q) >= 0;
+  }
+  function isSoon(it) { var e = expiryInfo(it.expiry); return !!e && (e.status === 'expired' || e.status === 'soon'); }
+
+  function stockText(it) {
+    if (it.stock == null) return 'нет числа';
+    return (it.stockApprox ? '≈ ' : '') + fmt(it.stock) + ' ' + (it.unit || 'шт');
+  }
+  function zoneChipMini(it) { var z = zoneOf(it); return z ? '<span class="zmini z' + z + '">' + z + '</span>' : ''; }
+
+  function counts() {
+    var c = { unclear: 0, expiry: 0, empty: 0 };
+    items.forEach(function (it) { if (it.unclear) c.unclear++; if (isSoon(it)) c.expiry++; if (it.stock === 0) c.empty++; });
+    return c;
+  }
+
+  function renderFilters() {
+    var c = counts();
+    var h = '<div class="frow" role="group" aria-label="Зона">';
+    h += '<button class="chip" type="button" data-act="zone" data-z="0" aria-pressed="' + (st.zone === 0) + '">Все зоны</button>';
+    [1, 2, 3, 4].forEach(function (z) {
+      var n = items.filter(function (it) { return zoneOf(it) === z; }).length;
+      h += '<button class="chip zc" style="--zc:var(--z' + z + ')" type="button" data-act="zone" data-z="' + z + '" aria-pressed="' + (st.zone === z) + '"><span class="zdot"></span>Зона ' + z + ' <span class="n">' + n + '</span></button>';
+    });
+    h += '</div><div class="frow" role="group" aria-label="Категория">';
+    h += '<button class="chip" type="button" data-act="cat" data-c="" aria-pressed="' + (st.cat === '') + '">Все категории</button>';
+    CATEGORIES.forEach(function (cat) {
+      h += '<button class="chip" type="button" data-act="cat" data-c="' + esc(cat) + '" aria-pressed="' + (st.cat === cat) + '">' + esc(cat) + '</button>';
+    });
+    h += '</div><div class="frow" role="group" aria-label="Требуют внимания">';
+    [['expiry', 'Срок истёк или скоро', 'bad'], ['unclear', 'Уточнить', 'warn'], ['empty', 'Закончилось', 'bad']].forEach(function (f) {
+      if (c[f[0]] === 0 && !st.flags[f[0]]) return;
+      h += '<button class="chip flag" data-kind="' + f[2] + '" type="button" data-act="flag" data-f="' + f[0] + '" aria-pressed="' + st.flags[f[0]] + '">' + f[1] + ' <span class="n">' + c[f[0]] + '</span></button>';
+    });
+    h += '</div>';
+    if (st.view === 'list') {
+      h += '<div class="tools"><label for="sortSel">Сортировка <select id="sortSel"><option value="name">По названию</option><option value="zone">По зоне</option><option value="expiry">По сроку годности</option><option value="stock">По остатку</option></select></label></div>';
+    }
+    document.getElementById('filters').innerHTML = h;
+    var sel = document.getElementById('sortSel');
+    if (sel) sel.value = st.sort;
+    var vb = document.querySelectorAll('[data-act="view"]');
+    for (var i = 0; i < vb.length; i++) vb[i].setAttribute('aria-pressed', String(vb[i].getAttribute('data-v') === st.view));
+  }
+
+  function filtered() {
+    var list = items.filter(function (it) {
+      if (!matchesQ(it)) return false;
+      if (st.zone && zoneOf(it) !== st.zone) return false;
+      if (st.cat && it.category !== st.cat) return false;
+      if (st.flags.unclear && !it.unclear) return false;
+      if (st.flags.expiry && !isSoon(it)) return false;
+      if (st.flags.empty && it.stock !== 0) return false;
+      return true;
+    });
+    var ru = function (a, b) { return (a.name || '').localeCompare(b.name || '', 'ru'); };
+    if (st.sort === 'zone') list.sort(function (a, b) { return (zoneOf(a) || 9) - (zoneOf(b) || 9) || ru(a, b); });
+    else if (st.sort === 'expiry') list.sort(function (a, b) {
+      var ea = expiryInfo(a.expiry), eb = expiryInfo(b.expiry);
+      var x = ea && ea.end ? ea.end : Infinity, y = eb && eb.end ? eb.end : Infinity;
+      return x === y ? ru(a, b) : x - y;
+    });
+    else if (st.sort === 'stock') list.sort(function (a, b) {
+      var x = a.stock == null ? Infinity : a.stock, y = b.stock == null ? Infinity : b.stock;
+      return x === y ? ru(a, b) : x - y;
+    });
+    else list.sort(ru);
+    return list;
+  }
+
+  function stockHtml(it) {
+    var id = esc(it.id), u = it.unit || 'шт';
+    if (st.editingStock === it.id) {
+      return '<div class="stock"><input id="si" class="sin" type="number" inputmode="decimal" step="any" min="0" value="' + (it.stock == null ? '' : it.stock) + '" aria-label="Остаток"><span class="unit">' + esc(u) + '</span></div>';
+    }
+    var step = stepOf(u), has = it.stock != null;
+    return '<div class="stock">' +
+      '<button class="sb" type="button" data-act="dec" data-id="' + id + '" aria-label="Убавить на ' + step + '"' + (has && it.stock > 0 ? '' : ' disabled') + '>−</button>' +
+      '<button class="sv" type="button" data-act="editstock" data-id="' + id + '" aria-label="Изменить остаток">' + (has ? (it.stockApprox ? '≈' : '') + fmt(it.stock) : '—') + '<span class="unit">' + esc(u) + '</span></button>' +
+      '<button class="sb" type="button" data-act="inc" data-id="' + id + '" aria-label="Добавить ' + step + '">+</button></div>';
+  }
+
+  function locHtml(it) {
+    var z = zoneOf(it), Z = ZONES[z];
+    if (Z) return '<div class="loc z' + z + '"><span class="zn">' + z + '</span><span class="lt"><b>' + esc(Z.n) + '</b><small>' + esc(Z.b) + ' · ' + esc(Z.d) + '</small></span></div>';
+    if (it.location) return '<div class="loc z0"><span class="zn">?</span><span class="lt"><b>' + esc(it.location) + '</b></span></div>';
+    return '<div class="loc z0"><span class="zn">?</span><span class="lt"><b>Место не указано</b></span></div>';
+  }
+
+  function cardHtml(it) {
+    var id = esc(it.id), ex = expiryInfo(it.expiry), tags = '';
+    if (it.category) tags += '<span class="tag">' + esc(it.category) + '</span>';
+    if (it.substance) tags += '<span class="tag sub">' + esc(it.substance) + '</span>';
+    if (ex) tags += '<span class="tag exp ' + ex.status + '">' + (ex.status === 'expired' ? 'Срок истёк · ' : ex.status === 'soon' ? 'Скоро срок · ' : 'Годен ') + esc(ex.label) + '</span>';
+    if (it.unclear) tags += '<span class="tag unclear">Уточнить</span>';
+    if (it.stock === 0) tags += '<span class="tag empty">Закончилось</span>';
+    var acts = st.delConfirm === it.id
+      ? '<button class="link del" type="button" data-act="delyes" data-id="' + id + '">Удалить насовсем</button><button class="link plain" type="button" data-act="delno">Отмена</button>'
+      : '<button class="link" type="button" data-act="edit" data-id="' + id + '">Изменить</button><button class="link del" type="button" data-act="del" data-id="' + id + '">Удалить</button>';
+    return '<article class="card"><div class="card-top"><div><div class="name">' + esc(it.name) + '</div>' +
+      (it.form ? '<div class="qtext">' + esc(cap(it.form)) + '</div>' : '') + '</div>' + stockHtml(it) + '</div>' +
+      locHtml(it) +
+      (tags ? '<div class="tags">' + tags + '</div>' : '') +
+      (it.notes ? '<p class="notes" data-act="note">' + esc(it.notes) + '</p>' : '') +
+      '<div class="acts">' + acts + '</div></article>';
+  }
+
+  function analogHtml() {
+    var q = st.q.trim().toLowerCase();
+    if (!q) return '';
+    var keys = [];
+    function add(c) { if (keys.indexOf(c) < 0) keys.push(c); }
+    var direct = items.filter(matchesQ);
+    direct.forEach(function (it) { comps(it).forEach(add); });
+    items.forEach(function (it) { comps(it).forEach(function (c) { if (c.indexOf(q) >= 0) add(c); }); });
+    var gs = [];
+    keys.forEach(function (c) {
+      var arr = items.filter(function (it) { return comps(it).indexOf(c) >= 0; });
+      if (arr.length >= 2) gs.push([c, arr]);
+    });
+    if (!gs.length) return '';
+    var h = '<section class="analogs"><h2>Дома с тем же действующим веществом</h2>';
+    gs.forEach(function (g) {
+      h += '<div class="agroup"><div class="k">' + esc(cap(g[0])) + ' · ' + g[1].length + '</div><div class="achips">';
+      g[1].forEach(function (it) {
+        var z = zoneOf(it);
+        h += '<button type="button" class="ach" data-act="pick" data-name="' + esc(it.name) + '"><b>' + esc(it.name) + '</b><span>' + esc(stockText(it)) + (z ? ' · зона ' + z : '') + '</span></button>';
+      });
+      h += '</div></div>';
+    });
+    return h + '</section>';
+  }
+
+  function subsHtml() {
+    var map = {}, order = [];
+    items.forEach(function (it) {
+      comps(it).forEach(function (c) { if (!map[c]) { map[c] = []; order.push(c); } map[c].push(it); });
+    });
+    var q = st.q.trim().toLowerCase();
+    var gs = order.filter(function (c) { return map[c].length >= 2; }).filter(function (c) {
+      return !q || c.indexOf(q) >= 0 || map[c].some(function (it) { return (it.name || '').toLowerCase().indexOf(q) >= 0; });
+    }).sort(function (a, b) { return map[b].length - map[a].length || a.localeCompare(b, 'ru'); });
+    if (!gs.length) return '<div class="empty">Повторяющихся действующих веществ не найдено</div>';
+    var h = '<div class="grid">';
+    gs.forEach(function (c) {
+      h += '<section class="sgroup"><h3>' + esc(cap(c)) + '<span>' + map[c].length + ' препарата дома</span></h3>';
+      map[c].slice().sort(function (a, b) { return (a.name || '').localeCompare(b.name || '', 'ru'); }).forEach(function (it) {
+        h += '<div class="srow"><span class="sn">' + esc(it.name) + '</span><span class="sm">' + esc(stockText(it)) + zoneChipMini(it) + '</span></div>';
+      });
+      h += '</section>';
+    });
+    return h + '</div>';
+  }
+
+  function renderContent() {
+    var el = document.getElementById('content'), h;
+    if (st.view === 'subs') {
+      h = '<p class="notice" style="margin:0 0 12px">Вещества, которые встречаются в двух и более препаратах. Проверяйте этот список, чтобы не купить дубль.</p>' + subsHtml();
+    } else {
+      var list = filtered();
+      h = analogHtml();
+      h += list.length ? '<div class="grid"' + (h ? ' style="margin-top:14px"' : '') + '>' + list.map(cardHtml).join('') + '</div>' : '<div class="empty">Ничего не найдено. Измените запрос или фильтры.</div>';
+      document.getElementById('count').textContent = 'Показано ' + list.length + ' из ' + items.length;
+    }
+    if (st.view === 'subs') document.getElementById('count').textContent = items.length + ' позиций';
+    el.innerHTML = h;
+    if (st.editingStock) { var si = document.getElementById('si'); if (si) { si.focus(); si.select(); } }
+    var foot = document.getElementById('foot');
+    foot.innerHTML = '<span>Срок считается до конца указанного месяца.</span>' +
+      (st.resetConfirm
+        ? '<span><button class="btn danger" type="button" data-act="resetyes">Сбросить все правки</button> <button class="btn" type="button" data-act="resetno">Отмена</button></span>'
+        : '<button class="btn" type="button" data-act="reset">Вернуть данные на 25.09.2026</button>');
+  }
+  function renderAll() { renderFilters(); renderContent(); }
+
+  /* ---------- sheet ---------- */
+  var ov = document.getElementById('overlay');
+  function fillSelects() {
+    document.getElementById('f_cat').innerHTML = CATEGORIES.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
+    document.getElementById('f_zone').innerHTML = '<option value="0">Не указано</option>' + [1, 2, 3, 4].map(function (z) { return '<option value="' + z + '">Зона ' + z + ' · ' + esc(ZONES[z].n) + '</option>'; }).join('');
+    document.getElementById('f_unit').innerHTML = UNITS.map(function (u) { return '<option>' + u + '</option>'; }).join('');
+    document.getElementById('f_form').innerHTML = '<option value="">Не указана</option>' + FORMS.map(function (f) { return '<option>' + esc(f) + '</option>'; }).join('');
+  }
+  function openSheet(id) {
+    st.editId = id || null;
+    var it = id ? byId(id) : { name: '', substance: '', category: CATEGORIES[0], location: '', stock: null, unit: 'шт', stockApprox: false, quantity: '', form: '', expiry: '', notes: '', unclear: false };
+    document.getElementById('sheetTitle').textContent = id ? 'Изменить лекарство' : 'Добавить лекарство';
+    document.getElementById('f_name').value = it.name || '';
+    document.getElementById('f_sub').value = it.substance || '';
+    document.getElementById('f_cat').value = it.category || CATEGORIES[0];
+    document.getElementById('f_zone').value = String(zoneOf(it));
+    document.getElementById('f_stock').value = it.stock == null ? '' : it.stock;
+    document.getElementById('f_unit').value = it.unit || 'шт';
+    document.getElementById('f_approx').checked = !!it.stockApprox;
+    document.getElementById('f_qty').value = it.quantity || '';
+    document.getElementById('f_form').value = it.form || '';
+    document.getElementById('f_exp').value = it.expiry || '';
+    document.getElementById('f_notes').value = it.notes || '';
+    document.getElementById('f_unclear').checked = !!it.unclear;
+    document.getElementById('f_err').textContent = '';
+    ov.hidden = false;
+    document.getElementById('f_name').focus();
+  }
+  function closeSheet() { ov.hidden = true; st.editId = null; }
+  function saveSheet() {
+    var name = document.getElementById('f_name').value.trim();
+    if (!name) { document.getElementById('f_err').textContent = 'Введите название препарата.'; return; }
+    var sv = document.getElementById('f_stock').value.trim();
+    var zone = +document.getElementById('f_zone').value;
+    var old = st.editId ? byId(st.editId) : null;
+    var loc = old && zoneOf(old) === zone ? old.location : (zone ? ZONES[zone].loc : '');
+    var data = {
+      name: name,
+      substance: document.getElementById('f_sub').value.trim(),
+      category: document.getElementById('f_cat').value,
+      location: loc,
+      unit: document.getElementById('f_unit').value,
+      quantity: document.getElementById('f_qty').value.trim(),
+      form: document.getElementById('f_form').value,
+      expiry: document.getElementById('f_exp').value.trim(),
+      notes: document.getElementById('f_notes').value.trim(),
+      unclear: document.getElementById('f_unclear').checked,
+      stockApprox: document.getElementById('f_approx').checked
+    };
+    if (sv !== '' && !isNaN(+sv)) data.stock = +sv; else delete data.stock;
+    if (old) { Object.keys(data).forEach(function (k) { old[k] = data[k]; }); if (!('stock' in data)) delete old.stock; }
+    else { data.id = 'u' + Date.now().toString(36); items.push(data); }
+    save(); closeSheet(); renderAll();
+  }
+
+  /* ---------- events ---------- */
+  document.getElementById('q').addEventListener('input', function (e) { st.q = e.target.value; renderContent(); });
+  document.getElementById('addBtn').addEventListener('click', function () { openSheet(null); });
+  document.getElementById('cancelBtn').addEventListener('click', closeSheet);
+  document.getElementById('saveBtn').addEventListener('click', saveSheet);
+  ov.addEventListener('click', function (e) { if (e.target === ov) closeSheet(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !ov.hidden) closeSheet();
+    if (e.target && e.target.id === 'si') {
+      if (e.key === 'Enter') e.target.blur();
+      else if (e.key === 'Escape') { st.editingStock = null; renderContent(); }
+    }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'sortSel') { st.sort = e.target.value; renderContent(); }
+  });
+  document.addEventListener('focusout', function (e) {
+    if (e.target && e.target.id === 'si' && st.editingStock) {
+      var it = byId(st.editingStock), v = e.target.value.trim();
+      st.editingStock = null;
+      if (it && v !== '' && !isNaN(+v)) { it.stock = Math.max(0, +v); it.stockApprox = false; save(); }
+      renderAll();
+    }
+  });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!t) return;
+    var act = t.getAttribute('data-act'), id = t.getAttribute('data-id'), it = id ? byId(id) : null;
+    if (act === 'view') { st.view = t.getAttribute('data-v'); renderAll(); }
+    else if (act === 'zone') { st.zone = +t.getAttribute('data-z'); renderAll(); }
+    else if (act === 'cat') { st.cat = t.getAttribute('data-c'); renderAll(); }
+    else if (act === 'flag') { var f = t.getAttribute('data-f'); st.flags[f] = !st.flags[f]; renderAll(); }
+    else if (act === 'inc' && it) { it.stock = Math.round(((it.stock || 0) + stepOf(it.unit)) * 100) / 100; save(); renderAll(); }
+    else if (act === 'dec' && it) { it.stock = Math.max(0, Math.round(((it.stock || 0) - stepOf(it.unit)) * 100) / 100); save(); renderAll(); }
+    else if (act === 'editstock' && it) { st.editingStock = it.id; renderContent(); }
+    else if (act === 'edit' && it) { openSheet(it.id); }
+    else if (act === 'del' && it) { st.delConfirm = it.id; renderContent(); }
+    else if (act === 'delno') { st.delConfirm = null; renderContent(); }
+    else if (act === 'delyes' && it) { items = items.filter(function (x) { return x.id !== it.id; }); st.delConfirm = null; save(); renderAll(); }
+    else if (act === 'note') { t.classList.toggle('open'); }
+    else if (act === 'pick') { st.q = t.getAttribute('data-name'); document.getElementById('q').value = st.q; renderContent(); window.scrollTo(0, 0); }
+    else if (act === 'reset') { st.resetConfirm = true; renderContent(); }
+    else if (act === 'resetno') { st.resetConfirm = false; renderContent(); }
+    else if (act === 'resetyes') { items = clone(SEED); st.resetConfirm = false; save(); renderAll(); }
+  });
+
+
+  // ---- Синхронизация с GitHub (data.json в репозитории) ----
+  var GH_REPO = 'VladimirKornienko2000/home-apteka-x7k2', GH_FILE = 'data.json', TOK_KEY = 'apteka-gh-token', DIRTY_KEY = 'apteka-dirty';
+  var syncTimer = null, syncBusy = false;
+  function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  function lsSet(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function setSync(label, msg) {
+    document.getElementById('syncBtn').textContent = label;
+    if (msg != null) document.getElementById('syncMsg').textContent = msg;
+  }
+  function ghUrl() { return 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE; }
+  function ghHeaders(raw) {
+    var h = { 'Accept': raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json' };
+    var t = lsGet(TOK_KEY); if (t) h['Authorization'] = 'Bearer ' + t;
+    return h;
+  }
+  function b64(s) { return btoa(unescape(encodeURIComponent(s))); }
+  function pullRemote() {
+    return fetch(ghUrl() + '?t=' + Date.now(), { headers: ghHeaders(true), cache: 'no-store' }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (a) {
+      if (!Array.isArray(a) || !a.length) throw new Error('пустые данные');
+      items = a; try { localStorage.setItem(LS_KEY, JSON.stringify(items)); } catch (e) {}
+      lsSet(DIRTY_KEY, null); renderAll();
+    });
+  }
+  function pushRemote() {
+    if (!lsGet(TOK_KEY)) { setSync('☁ без токена', 'Правки сохранены только на этом устройстве. Введите токен, чтобы они попадали на все устройства.'); return Promise.resolve(); }
+    if (syncBusy) { scheduleSync(); return Promise.resolve(); }
+    syncBusy = true; setSync('☁ сохраняю…');
+    return fetch(ghUrl() + '?t=' + Date.now(), { headers: ghHeaders(false), cache: 'no-store' }).then(function (r) {
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (meta) {
+      var body = { message: 'Обновление базы ' + new Date().toISOString(), content: b64(JSON.stringify(items, null, 1)) };
+      if (meta && meta.sha) body.sha = meta.sha;
+      return fetch(ghUrl(), { method: 'PUT', headers: ghHeaders(false), body: JSON.stringify(body) });
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      lsSet(DIRTY_KEY, null); setSync('☁ синхронизировано', 'Сохранено в GitHub: ' + new Date().toLocaleString('ru-RU'));
+    }).catch(function (e) {
+      setSync('☁ ошибка', 'Не удалось сохранить (' + e.message + '). Правки остались на устройстве, повторю при следующем изменении.');
+    }).then(function () { syncBusy = false; });
+  }
+  function scheduleSync() { lsSet(DIRTY_KEY, '1'); clearTimeout(syncTimer); syncTimer = setTimeout(pushRemote, 1500); }
+  function initSync() {
+    var btn = document.getElementById('syncBtn'), panel = document.getElementById('syncPanel');
+    btn.addEventListener('click', function () { panel.hidden = !panel.hidden; });
+    document.getElementById('syncSaveTok').addEventListener('click', function () {
+      var v = document.getElementById('syncTok').value.trim();
+      if (v) { lsSet(TOK_KEY, v); document.getElementById('syncTok').value = ''; setSync('☁ токен сохранён', 'Токен сохранён на этом устройстве.'); pushRemote(); }
+    });
+    document.getElementById('syncNow').addEventListener('click', function () {
+      (lsGet(DIRTY_KEY) ? pushRemote() : pullRemote().then(function () { setSync('☁ синхронизировано', 'Данные загружены: ' + new Date().toLocaleString('ru-RU')); })).catch(function (e) { setSync('☁ ошибка', 'Ошибка: ' + e.message); });
+    });
+    if (lsGet(DIRTY_KEY) && lsGet(TOK_KEY)) { pushRemote(); }
+    else { pullRemote().then(function () { setSync('☁ синхронизировано', 'Данные загружены из GitHub.'); }).catch(function () { setSync(lsGet(TOK_KEY) ? '☁ офлайн' : '☁ без токена', 'Не удалось загрузить данные из GitHub, показаны сохранённые на устройстве.'); }); }
+  }
+  fillSelects();
+  renderAll();
+  window.__syncReady = true; initSync();
+})();
+</script>
+
+</body></html>
+<!-- 82 позиции. Добавлен Геделикс (m081). 26.09.2026. -->
